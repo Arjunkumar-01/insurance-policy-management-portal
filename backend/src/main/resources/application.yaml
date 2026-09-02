@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: portal
+
+#  Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/insurance_portal
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+      open-in-view: false
+
+  properties:
+        hibernate:
+        format_dql: true
+
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.hibernate.orm.jdbc.bind: TRACE
+      org.hibernate.tool.schema: DEBUG
