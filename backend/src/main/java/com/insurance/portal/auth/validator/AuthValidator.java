@@ -15,6 +15,10 @@ public class AuthValidator {
 
 //    Validates registration request
     public void validateRegistration(RegisterRequest request) {
+        if (request == null) {
+            throw new BadRequestException("Registration request cannot be null.");
+        }
+
         validatePassword(request);
 
         validateUsername(request.getUsername());
@@ -39,6 +43,10 @@ public class AuthValidator {
 
 //    Username should be unique
     private void validateUsername(String username) {
+        if (username == null || username.isBlank()) {
+            throw new BadRequestException("Username is required.");
+        }
+
         if(customerRepository.existsByUsername(username)) {
             throw new BadRequestException("Username already exists.");
         }
@@ -46,6 +54,10 @@ public class AuthValidator {
 
 //    Email should be unique
     private void validateEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new BadRequestException("Email is required.");
+        }
+
         if(customerRepository.existsByEmail(email)) {
             throw new BadRequestException("Email already exists.");
         }

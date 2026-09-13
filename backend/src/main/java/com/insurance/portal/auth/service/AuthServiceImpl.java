@@ -9,12 +9,11 @@ import com.insurance.portal.auth.validator.AuthValidator;
 import com.insurance.portal.common.enums.Role;
 import com.insurance.portal.customer.entity.Customer;
 import com.insurance.portal.customer.repository.CustomerRepository;
-import com.insurance.portal.exception.DuplicateResourceException;
 import com.insurance.portal.exception.UnauthorizedException;
+import com.insurance.portal.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +30,8 @@ public class AuthServiceImpl implements AuthService{
     private final PasswordEncoder passwordEncoder;
 
     private final AuthValidator authValidator;
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -75,10 +76,13 @@ public class AuthServiceImpl implements AuthService{
 
         log.info("Login successful for username: {}", customer.getUsername());
 
+        String accessToken = jwtTokenProvider.generateToken(customer.getUsername(), customer.getRole().name());
+
         return LoginResponse.builder()
                 .username(customer.getUsername())
                 .role(customer.getRole())
-                .accessToken(null)
+                .fullName(customer.getFirstName() + " " + customer.getLastName())
+                .accessToken(accessToken)
                 .tokenType("Bearer")
                 .build();
     }

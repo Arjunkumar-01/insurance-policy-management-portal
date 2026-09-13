@@ -1,0 +1,74 @@
+# =============================================================================
+# Root .gitignore for Insurance Policy Management Portal (IPMP)
+# =============================================================================
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# IDE & Editor Files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.iml
+*.iws
+*.ipr
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-workspace
+*.sublime-project
+.settings/
+.classpath
+.project
+.factorypath
+.springBeans
+.sts4-cache
+
+# Build Outputs & Generated Folders
+**/target/
+**/dist/
+**/dist-ssr/
+**/node_modules/
+**/build/
+**/.nb-gradle/
+**/nbproject/private/
+**/nbbuild/
+**/nbdist/
+
+# Logs
+**/logs/
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+**/lerna-debug.log*
+
+# Environment & Sensitive Files
+**/.env
+**/.env.*
+**/*.local
+!**/.env.*.example
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.jks
+**/*.env.production
+
+# Temporary & Cache Files
+**/*.tmp
+**/*.bak
+**/.tmp/
+**/.cache/
+**/.eslintcache
+**/.tsbuildinfo

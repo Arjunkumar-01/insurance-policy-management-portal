@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Logs
+logs/
+*.log
+
+# Environment files can contain production database and JWT secrets.
+.env
+.env.*
+!.env.*.example

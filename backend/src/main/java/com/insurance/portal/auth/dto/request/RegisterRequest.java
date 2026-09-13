@@ -47,7 +47,7 @@ public class RegisterRequest {
 
     @NotBlank(message = "Password is required")
     @Pattern(
-            regexp = "^(?=,*[A-Z])(?=,[a-z])(?=,*\\d)(?=,*[@#$%^&+=!]).{8,20}$",
+            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,20}$",
             message = "Password must contain uppercase, lowercase, number and special character."
     )
     private String password;

@@ -22,7 +22,7 @@ public class ApiResponse<T>{
     private String message;
 
 //    Response payload.
-    private T date;
+    private T data;
 
 //    Response generation timestamp.
     @Builder.Default

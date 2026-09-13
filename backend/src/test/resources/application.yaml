@@ -1,0 +1,13 @@
+spring:
+  flyway:
+    enabled: false
+
+security:
+  jwt:
+    secret: test-secret-key-for-context-loads
+    expiration-ms: 3600000
+
+app:
+  product:
+    seed:
+      enabled: false

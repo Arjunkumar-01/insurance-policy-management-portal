@@ -3,7 +3,6 @@ package com.insurance.portal.auth.mapper;
 import com.insurance.portal.auth.dto.request.RegisterRequest;
 import com.insurance.portal.auth.dto.response.RegisterResponse;
 import com.insurance.portal.customer.entity.Customer;
-import org.springframework.beans.factory.config.CustomEditorConfigurer;
 import org.springframework.stereotype.Component;
 
 @Component
