@@ -44,6 +44,8 @@ app:
       password: ${VALIDATION_ADMIN_PASSWORD:}
 
 logging:
+  file:
+    path: ${LOG_PATH:logs}
   level:
     root: INFO
 

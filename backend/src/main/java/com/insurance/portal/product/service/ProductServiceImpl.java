@@ -4,6 +4,7 @@ import com.insurance.portal.common.enums.ProductCategory;
 import com.insurance.portal.common.enums.ProductStatus;
 import com.insurance.portal.exception.BadRequestException;
 import com.insurance.portal.exception.ResourceNotFoundException;
+import com.insurance.portal.observability.service.AuditLogService;
 import com.insurance.portal.product.dto.CreateProductRequest;
 import com.insurance.portal.product.dto.ProductResponse;
 import com.insurance.portal.product.dto.UpdateProductRequest;
@@ -11,6 +12,7 @@ import com.insurance.portal.product.entity.Product;
 import com.insurance.portal.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,9 +20,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+
+    private final AuditLogService auditLogService;
 
     @Override
     public ProductResponse createProduct(CreateProductRequest request) {
@@ -39,7 +44,12 @@ public class ProductServiceImpl implements ProductService {
                 .status(ProductStatus.ACTIVE)
                 .build();
 
-        return toResponse(productRepository.save(product));
+        Product savedProduct = productRepository.save(product);
+        log.info("event=product_created productId={} productCode={}", savedProduct.getId(), savedProduct.getProductCode());
+        if (auditLogService != null) {
+            auditLogService.record("CREATE_PRODUCT", "PRODUCT", savedProduct.getId(), "Product created");
+        }
+        return toResponse(savedProduct);
     }
 
     @Override
@@ -59,13 +69,22 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(request.getDescription());
         product.setPolicyTenureMonths(request.getPolicyTenureMonths());
 
-        return toResponse(productRepository.save(product));
+        Product savedProduct = productRepository.save(product);
+        log.info("event=product_updated productId={}", savedProduct.getId());
+        if (auditLogService != null) {
+            auditLogService.record("UPDATE_PRODUCT", "PRODUCT", savedProduct.getId(), "Product updated");
+        }
+        return toResponse(savedProduct);
     }
 
     @Override
     public void deleteProduct(Long id) {
         Product product = getProductEntity(id);
         productRepository.delete(product);
+        log.info("event=product_deleted productId={}", id);
+        if (auditLogService != null) {
+            auditLogService.record("DELETE_PRODUCT", "PRODUCT", id, "Product deleted");
+        }
     }
 
     @Override

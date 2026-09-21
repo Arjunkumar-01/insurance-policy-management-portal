@@ -10,6 +10,7 @@ import com.insurance.portal.common.enums.Role;
 import com.insurance.portal.customer.entity.Customer;
 import com.insurance.portal.customer.repository.CustomerRepository;
 import com.insurance.portal.exception.UnauthorizedException;
+import com.insurance.portal.observability.service.AuditLogService;
 import com.insurance.portal.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,8 @@ public class AuthServiceImpl implements AuthService{
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final AuditLogService auditLogService;
+
     @Override
     public RegisterResponse register(RegisterRequest request) {
 
@@ -49,6 +52,10 @@ public class AuthServiceImpl implements AuthService{
         Customer savedCustomer = customerRepository.save(customer);
 
         log.info("Customer registered successfully with ID: {}", savedCustomer.getId());
+        if (auditLogService != null) {
+            auditLogService.record(savedCustomer.getUsername(), savedCustomer.getRole().name(),
+                "REGISTER", "CUSTOMER", savedCustomer.getId(), "Customer registration completed");
+        }
 
         RegisterResponse response = authMapper.toRegisterResponse(savedCustomer);
 
@@ -75,6 +82,10 @@ public class AuthServiceImpl implements AuthService{
         }
 
         log.info("Login successful for username: {}", customer.getUsername());
+        if (auditLogService != null) {
+            auditLogService.record(customer.getUsername(), customer.getRole().name(),
+                "LOGIN", "CUSTOMER", customer.getId(), "Login completed");
+        }
 
         String accessToken = jwtTokenProvider.generateToken(customer.getUsername(), customer.getRole().name());
 

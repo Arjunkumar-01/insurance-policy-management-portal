@@ -80,9 +80,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleGenericException(
             Exception ex) {
 
-        log.error("[{}] {}",
+        log.error("event=unhandled_exception exception={} message={}",
                 ex.getClass().getSimpleName(),
-                ex.getMessage());
+                ex.getMessage(),
+                ex);
 
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
