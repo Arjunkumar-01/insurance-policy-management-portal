@@ -7,6 +7,7 @@ import com.insurance.portal.customer.entity.Customer;
 import com.insurance.portal.customer.repository.CustomerRepository;
 import com.insurance.portal.exception.BadRequestException;
 import com.insurance.portal.exception.ResourceNotFoundException;
+import com.insurance.portal.observability.service.AuditLogService;
 import com.insurance.portal.payment.dto.MakePaymentRequest;
 import com.insurance.portal.payment.dto.PaymentAnalyticsResponse;
 import com.insurance.portal.payment.dto.PaymentReceiptResponse;
@@ -21,6 +22,7 @@ import com.insurance.portal.policy.repository.PolicyRepository;
 import com.insurance.portal.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -37,11 +39,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PolicyRepository policyRepository;
     private final CustomerRepository customerRepository;
+
+    private final AuditLogService auditLogService;
 
     @Override
     public PaymentResponse makePayment(MakePaymentRequest request) {
@@ -79,7 +84,13 @@ public class PaymentServiceImpl implements PaymentService {
         transition(payment, PaymentStatus.PROCESSING, null);
         transition(payment, PaymentStatus.SUCCESSFUL, null);
 
-        return toResponse(paymentRepository.save(payment));
+        Payment savedPayment = paymentRepository.save(payment);
+        log.info("event=payment_completed paymentId={} paymentReference={} status={}",
+            savedPayment.getId(), savedPayment.getPaymentReference(), savedPayment.getStatus());
+        if (auditLogService != null) {
+            auditLogService.record("PAYMENT_COMPLETED", "PAYMENT", savedPayment.getId(), "Payment completed");
+        }
+        return toResponse(savedPayment);
     }
 
     @Override

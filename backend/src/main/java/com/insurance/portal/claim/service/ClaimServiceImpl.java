@@ -14,11 +14,13 @@ import com.insurance.portal.customer.entity.Customer;
 import com.insurance.portal.customer.repository.CustomerRepository;
 import com.insurance.portal.exception.BadRequestException;
 import com.insurance.portal.exception.ResourceNotFoundException;
+import com.insurance.portal.observability.service.AuditLogService;
 import com.insurance.portal.policy.entity.Policy;
 import com.insurance.portal.policy.repository.PolicyRepository;
 import com.insurance.portal.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -38,11 +40,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ClaimServiceImpl implements ClaimService {
 
     private final ClaimRepository claimRepository;
     private final PolicyRepository policyRepository;
     private final CustomerRepository customerRepository;
+
+    private final AuditLogService auditLogService;
 
     @Override
     public ClaimResponse submitClaim(SubmitClaimRequest request) {
@@ -78,7 +83,12 @@ public class ClaimServiceImpl implements ClaimService {
                 .submittedDate(LocalDateTime.now())
                 .build();
 
-        return toResponse(claimRepository.save(claim));
+        Claim savedClaim = claimRepository.save(claim);
+        log.info("event=claim_submitted claimId={} claimNumber={}", savedClaim.getId(), savedClaim.getClaimNumber());
+        if (auditLogService != null) {
+            auditLogService.record("SUBMIT_CLAIM", "CLAIM", savedClaim.getId(), "Claim submitted");
+        }
+        return toResponse(savedClaim);
     }
 
     @Override
@@ -147,7 +157,12 @@ public class ClaimServiceImpl implements ClaimService {
         claim.setStatus(ClaimStatus.UNDER_REVIEW);
         claim.setReviewedDate(LocalDateTime.now());
         claim.setDecisionReason(sanitizeReason(decisionReason));
-        return toResponse(claimRepository.save(claim));
+        Claim savedClaim = claimRepository.save(claim);
+        log.info("event=claim_approved claimId={} claimNumber={}", savedClaim.getId(), savedClaim.getClaimNumber());
+        if (auditLogService != null) {
+            auditLogService.record("APPROVE_CLAIM", "CLAIM", savedClaim.getId(), "Claim approved");
+        }
+        return toResponse(savedClaim);
     }
 
     @Override
@@ -160,7 +175,12 @@ public class ClaimServiceImpl implements ClaimService {
             claim.setReviewedDate(LocalDateTime.now());
         }
         claim.setDecisionReason(sanitizeReason(decisionReason));
-        return toResponse(claimRepository.save(claim));
+        Claim savedClaim = claimRepository.save(claim);
+        log.info("event=claim_rejected claimId={} claimNumber={}", savedClaim.getId(), savedClaim.getClaimNumber());
+        if (auditLogService != null) {
+            auditLogService.record("REJECT_CLAIM", "CLAIM", savedClaim.getId(), "Claim rejected");
+        }
+        return toResponse(savedClaim);
     }
 
     @Override

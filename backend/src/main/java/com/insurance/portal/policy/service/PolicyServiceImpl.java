@@ -9,6 +9,7 @@ import com.insurance.portal.customer.entity.Customer;
 import com.insurance.portal.customer.repository.CustomerRepository;
 import com.insurance.portal.exception.BadRequestException;
 import com.insurance.portal.exception.ResourceNotFoundException;
+import com.insurance.portal.observability.service.AuditLogService;
 import com.insurance.portal.policy.dto.PolicyCoverageResponse;
 import com.insurance.portal.policy.dto.PolicyResponse;
 import com.insurance.portal.policy.dto.PurchasePolicyRequest;
@@ -21,6 +22,7 @@ import com.insurance.portal.product.repository.ProductRepository;
 import com.insurance.portal.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -36,11 +38,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class PolicyServiceImpl implements PolicyService {
 
     private final PolicyRepository policyRepository;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
+
+    private final AuditLogService auditLogService;
 
     @Override
     public PolicyResponse createPolicy(PurchasePolicyRequest request) {
@@ -85,7 +90,12 @@ public class PolicyServiceImpl implements PolicyService {
                 .cancellationStatus(CancellationStatus.NONE)
                 .build();
 
-        return toResponse(policyRepository.save(policy));
+        Policy savedPolicy = policyRepository.save(policy);
+        log.info("event=policy_purchased policyId={} policyNumber={}", savedPolicy.getId(), savedPolicy.getPolicyNumber());
+        if (auditLogService != null) {
+            auditLogService.record("PURCHASE_POLICY", "POLICY", savedPolicy.getId(), "Policy purchase completed");
+        }
+        return toResponse(savedPolicy);
     }
 
     @Override
@@ -147,7 +157,12 @@ public class PolicyServiceImpl implements PolicyService {
         policy.setRenewalStatus(RenewalStatus.RENEWED);
         policy.setCancellationStatus(CancellationStatus.NONE);
 
-        return toResponse(policyRepository.save(policy));
+        Policy savedPolicy = policyRepository.save(policy);
+        log.info("event=policy_renewed policyId={} policyNumber={}", savedPolicy.getId(), savedPolicy.getPolicyNumber());
+        if (auditLogService != null) {
+            auditLogService.record("RENEW_POLICY", "POLICY", savedPolicy.getId(), "Policy renewal completed");
+        }
+        return toResponse(savedPolicy);
     }
 
     @Override
