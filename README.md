@@ -221,10 +221,45 @@ VITE_API_BASE_URL=http://your-ec2-public-dns.amazonaws.com:8080
 
 ## 📸 Screenshots & UI Showcase
 
-
 - **Customer Dashboard:** Metric cards, upcoming renewals, interactive payment history chart, quick action links.
 - **Product Catalog & Comparison:** Multi-category insurance product explorer with side-by-side comparison modal.
 - **Claims Lifecycle Queue:** Claims Officer worklist with structured approval, rejection, and settlement dialogs.
 - **Agent Customer Portfolio:** Multi-resource customer aggregation with renewal radar and open claim indicators.
 - **Admin Analytics:** Revenue distribution charts, policy loss ratios, and cancellation approval queue.
+
+The following views showcase the live application across customer, agent, claims, payment, product, and administrative workflows.
+
+### Live Application Views
+
+#### Login
+
+![Insurance Policy Management Portal Login](frontend/public/screenshots/Login.png)
+
+#### Customer Dashboard
+
+![Customer Dashboard](frontend/public/screenshots/Customer%20Dashboard.png)
+
+#### Agent Dashboard
+
+![Agent Dashboard](frontend/public/screenshots/Agent%20Dashboard.png)
+
+#### Claims Officer Dashboard
+
+![Claims Officer Dashboard](frontend/public/screenshots/Claims%20Officer%20Dashboard.png)
+
+#### Products
+
+![Insurance Products](frontend/public/screenshots/Products.png)
+
+#### Payment Analytics
+
+![Payment Analytics](frontend/public/screenshots/Payment%20Analytics.png)
+
+#### Admin Dashboard
+
+![Admin Dashboard](frontend/public/screenshots/Admin%20Dashboard.png)
+
+#### User Management
+
+![User Management](frontend/public/screenshots/User%20Management.png)
 
